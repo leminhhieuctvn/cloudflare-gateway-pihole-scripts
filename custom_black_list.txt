@@ -11,4 +11,3 @@ gdmf.apple.com
 axm-app.apple.com
 comm-cohort.ess.apple.com
 comm-main.ess.apple.com
-ppq.apple.com
