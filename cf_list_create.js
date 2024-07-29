@@ -1,5 +1,6 @@
 import { existsSync, writeFileSync, appendFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { execSync } from "child_process";
 
 import {
   createZeroTrustListsAtOnce,
