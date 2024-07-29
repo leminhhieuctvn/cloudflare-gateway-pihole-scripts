@@ -130,7 +130,7 @@ writeFileSync(hostsFile, ""); // Clear the file if it exists or create it if it 
 domains.forEach((domain) => {
   appendFileSync(hostsFile, `${domain}\n`);
 });
-
+console.log(hostsFile);
 // Export hostsFile path to GitHub environment
 execSync(`echo "HOSTS_FILE_PATH=${hostsFile}" >> $GITHUB_ENV`);
 
