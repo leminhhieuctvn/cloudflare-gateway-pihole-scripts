@@ -125,11 +125,14 @@ console.log(`Number of lists to be created: ${numberOfLists}`);
 console.log("\n\n");
 
 // Save domains into hosts.txt file
-const hostsFile = resolve("hosts");
+const hostsFile = resolve(process.cwd(), "hosts.txt");
 writeFileSync(hostsFile, ""); // Clear the file if it exists or create it if it doesn't
 domains.forEach((domain) => {
   appendFileSync(hostsFile, `${domain}\n`);
 });
+
+// Export hostsFile path to GitHub environment
+execSync(`echo "HOSTS_FILE_PATH=${hostsFile}" >> $GITHUB_ENV`);
 
 (async () => {
   if (DRY_RUN) {
