@@ -125,7 +125,7 @@ console.log(`Number of lists to be created: ${numberOfLists}`);
 console.log("\n\n");
 
 // Save domains into hosts.txt file
-const hostsFile = resolve("./hosts.txt");
+const hostsFile = resolve("hosts");
 writeFileSync(hostsFile, ""); // Clear the file if it exists or create it if it doesn't
 domains.forEach((domain) => {
   appendFileSync(hostsFile, `${domain}\n`);
