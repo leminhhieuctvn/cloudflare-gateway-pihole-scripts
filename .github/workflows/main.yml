@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: "leminhhieuctvn/cloudflare-gateway-pihole-scripts"
-          ref: "v1"
+         
 
       - name: Install Node.js
         uses: actions/setup-node@v4
