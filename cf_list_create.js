@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, writeFileSync, appendFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import {
@@ -96,7 +96,8 @@ await readFile(resolve(`./${blocklistFilename}`), (line, rl) => {
 
     // The higher-level domain is already blocked
     // so it's not necessary to block this domain
-    if (DEBUG) console.log(`Found ${item} in blocklist already - Skipping ${domain}`);
+    if (DEBUG)
+      console.log(`Found ${item} in blocklist already - Skipping ${domain}`);
     unnecessaryDomainCount++;
     return;
   }
@@ -122,6 +123,13 @@ console.log(`Number of allowed domains: ${allowedDomainCount}`);
 console.log(`Number of blocked domains: ${domains.length}`);
 console.log(`Number of lists to be created: ${numberOfLists}`);
 console.log("\n\n");
+
+// Save domains into hosts.txt file
+const hostsFile = resolve("./hosts.txt");
+writeFileSync(hostsFile, ""); // Clear the file if it exists or create it if it doesn't
+domains.forEach((domain) => {
+  appendFileSync(hostsFile, `${domain}\n`);
+});
 
 (async () => {
   if (DRY_RUN) {
