@@ -7,7 +7,6 @@ oa.zalo.me
 opentracking.zalopay.vn
 res-zalo.zadn.vn
 sentry-mini.zalo.me
-social.zalopay.vn
 stc-fin.zdn.vn
 stc-sp.zadn.vn
 stc-zmp.zadn.vn
