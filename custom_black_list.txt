@@ -15,3 +15,11 @@ zagoo.vn
 zalo.cloud
 zalo.video
 zinst-stc.zdn.vn
+ocsp.int-x3.letsencrypt.org
+ocsp.apple.com
+ocsp2.apple.com
+gdmf.apple.com
+world-gen.g.aaplimg.com
+iadc.qwape.com
+ppq.apple.com
+iphonediags.apple.com
