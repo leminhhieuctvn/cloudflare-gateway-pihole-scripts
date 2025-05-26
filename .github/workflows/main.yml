@@ -18,12 +18,10 @@ env:
 jobs:
   cgps:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          repository: "leminhhieuctvn/cloudflare-gateway-pihole-scripts"
-         
+        uses: actions/checkout@v4               
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -80,11 +78,16 @@ jobs:
         env:
           PING_URL: ${{ secrets.PING_URL }}
 
-  keepalive:
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: gautamkrishnar/keepalive-workflow@v2
+      - name: Generate
+        run: |
+          echo "Temp" >> ./temp.txt
+          
+      - name: Keep
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: keep
+          skip_checkout: true
+          skip_dirty_check: true
+          push_options: '--force'
+          file_pattern: ./temp.txt
+          commit_message: Bump
