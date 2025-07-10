@@ -2,13 +2,14 @@ import { existsSync, writeFileSync, appendFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { execSync } from "child_process";
 
-import { createZeroTrustListsOneByOne } from "./lib/api.js";
+import { createZeroTrustListsOneByOne, createZeroTrustListsForMultipleAccounts } from "./lib/api.js";
 import {
   DEBUG,
   DRY_RUN,
   LIST_ITEM_LIMIT,
   LIST_ITEM_SIZE,
   PROCESSING_FILENAME,
+  getAccountConfigs,
 } from "./lib/constants.js";
 import { normalizeDomain } from "./lib/helpers.js";
 import {
@@ -126,6 +127,7 @@ await readFile(resolve(`./${blocklistFilename}`), (line, rl) => {
   }
 });
 
+const accountConfigs = getAccountConfigs();
 const numberOfLists = Math.ceil(domains.length / LIST_ITEM_SIZE);
 
 console.log("\n\n");
@@ -134,6 +136,7 @@ console.log(`Number of duplicate domains: ${duplicateDomainCount}`);
 console.log(`Number of unnecessary domains: ${unnecessaryDomainCount}`);
 console.log(`Number of allowed domains: ${allowedDomainCount}`);
 console.log(`Number of blocked domains: ${domains.length}`);
+console.log(`Number of accounts configured: ${accountConfigs.length}`);
 console.log(`Number of lists to be created: ${numberOfLists}`);
 console.log("\n\n");
 
@@ -156,11 +159,18 @@ execSync(`echo "HOSTS_FILE_PATH=${hostsFile}" >> $GITHUB_ENV`);
   }
 
   console.log(
-    `Creating ${numberOfLists} lists for ${domains.length} domains...`
+    `Creating ${numberOfLists} lists for ${domains.length} domains across ${accountConfigs.length} accounts...`
   );
 
-  await createZeroTrustListsOneByOne(domains);
+  if (accountConfigs.length === 1) {
+    // Single account mode (backward compatibility)
+    await createZeroTrustListsOneByOne(domains);
+  } else {
+    // Multi-account mode
+    await createZeroTrustListsForMultipleAccounts(domains, accountConfigs);
+  }
+  
   await notifyWebhook(
-    `CF List Create script finished running (${domains.length} domains, ${numberOfLists} lists)`
+    `CF List Create script finished running (${domains.length} domains, ${numberOfLists} lists, ${accountConfigs.length} accounts)`
   );
 })();

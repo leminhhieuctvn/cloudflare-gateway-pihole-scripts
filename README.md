@@ -21,6 +21,7 @@ Cloudflare Gateway allows you to create custom rules to filter HTTP, DNS, and ne
 - **Allowlist support**, allowing you to prevent false positives and breakage by forcing trusted domains to always be unblocked.
 - Experimental **SNI-based filtering** that works independently of DNS settings, preventing unauthorized or malicious DNS changes from bypassing the filter.
 - Optional health check: Sends a ping request ensuring continuous monitoring and alerting for the workflow execution, or messages a Discord webhook with progress.
+- **Multi-account support** to work around Cloudflare's list item limits by distributing domains across multiple accounts.
 
 ## Usage
 
@@ -32,6 +33,40 @@ Cloudflare Gateway allows you to create custom rules to filter HTTP, DNS, and ne
 4. A file containing the domains you want to block - **max 300,000 domains for the free plan** - in the working directory named `blocklist.txt`. Mullvad provides awesome [DNS blocklists](https://github.com/mullvad/dns-blocklists) that work well with this project. A script that downloads recommended blocklists, `download_lists.js`, is included.
 5. Optional: You can whitelist domains by putting them in a file `allowlist.txt`. You can also use the `get_recomended_whitelist.sh` Bash script to get the recommended whitelists.
 6. Optional: A Discord (or similar) webhook URL to send notifications to.
+
+### Multi-Account Support
+
+If you need to block more domains than the `CLOUDFLARE_LIST_ITEM_LIMIT` (default 300,000), you can use multiple Cloudflare accounts to distribute the domains across them. This feature automatically:
+
+1. **Distributes domains evenly** across all configured accounts
+2. **Creates separate rules** for each account with their respective lists
+3. **Maintains backward compatibility** - if only one account is configured, it works as before
+
+#### How it works:
+
+- **1st account**: First `CLOUDFLARE_LIST_ITEM_LIMIT - 1` domains
+- **2nd account**: Next `CLOUDFLARE_LIST_ITEM_LIMIT - 1` domains  
+- **3rd account**: Next `CLOUDFLARE_LIST_ITEM_LIMIT - 1` domains
+- And so on...
+
+#### Setup for multiple accounts:
+
+1. **Create additional Cloudflare accounts** (each with their own Zero Trust subscription)
+2. **Add the new secrets** to your GitHub repository:
+   - `CLOUDFLARE_API_TOKEN_2`, `CLOUDFLARE_ACCOUNT_ID_2`
+   - `CLOUDFLARE_API_TOKEN_3`, `CLOUDFLARE_ACCOUNT_ID_3`
+   - `CLOUDFLARE_API_TOKEN_4`, `CLOUDFLARE_ACCOUNT_ID_4`
+   - `CLOUDFLARE_API_TOKEN_5`, `CLOUDFLARE_ACCOUNT_ID_5`
+   - (Continue as needed)
+
+3. **The script automatically detects** how many accounts are configured and distributes domains accordingly
+
+#### Example with 2 accounts and 500,000 domains (CLOUDFLARE_LIST_ITEM_LIMIT = 300,000):
+
+- Account 1: Domains 1-299,999 (299,999 domains)
+- Account 2: Domains 300,000-500,000 (200,001 domains)
+
+Each account will have its own Cloudflare Gateway rules that work independently but provide the same blocking functionality.
 
 ### Running locally
 
@@ -57,6 +92,7 @@ Please note that the GitHub Action downloads the recommended blocklists and whit
    - `CLOUDFLARE_LIST_ITEM_LIMIT`: The maximum number of blocked domains allowed for your Cloudflare Zero Trust plan. Default to 300,000. Optional if you are using the free plan.
    - `PING_URL`: /Optional/ The HTTP(S) URL to ping (using curl) after the GitHub Action has successfully updated your filters. Useful for monitoring.
    - `DISCORD_WEBHOOK_URL`: /Optional/ The Discord (or similar) webhook URL to send notifications to. Good for monitoring as well.
+   - **For multi-account support**: Add additional secrets like `CLOUDFLARE_API_TOKEN_2`, `CLOUDFLARE_ACCOUNT_ID_2`, etc.
 3. Create the following GitHub Actions variables in your repository settings if you desire:
    - `ALLOWLIST_URLS`: Uses your own allowlists. One URL per line. Recommended allowlists will be used if this variable is not provided.
    - `BLOCKLIST_URLS`: Uses your own blocklists. One URL per line. Recommended blocklists will be used if this variable is not provided.
