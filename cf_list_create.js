@@ -6,7 +6,6 @@ import { createZeroTrustListsOneByOne, createZeroTrustListsForMultipleAccounts }
 import {
   DEBUG,
   DRY_RUN,
-  LIST_ITEM_LIMIT,
   LIST_ITEM_SIZE,
   PROCESSING_FILENAME,
   getAccountConfigs,
@@ -63,10 +62,6 @@ await readFile(resolve(`./${allowlistFilename}`), (line) => {
 // Read blocklist
 console.log(`Processing ${blocklistFilename}`);
 await readFile(resolve(`./${blocklistFilename}`), (line, rl) => {
-  if (domains.length === LIST_ITEM_LIMIT) {
-    return;
-  }
-
   const _line = line.trim();
 
   if (!_line) return;
@@ -118,13 +113,6 @@ await readFile(resolve(`./${blocklistFilename}`), (line, rl) => {
 
   blocklist.set(domain, 1);
   domains.push(domain);
-
-  if (domains.length === LIST_ITEM_LIMIT) {
-    console.log(
-      "Maximum number of blocked domains reached - Stopping processing blocklist..."
-    );
-    rl.close();
-  }
 });
 
 const accountConfigs = getAccountConfigs();
