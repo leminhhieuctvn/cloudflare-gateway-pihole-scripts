@@ -81,7 +81,8 @@ jobs:
           PING_URL: ${{ secrets.PING_URL }}
 
       - name: Generate date and time
-            run: echo "DATE=$(date '+%F %T')" >> $GITHUB_ENV
+        run: |
+          echo "DATE=$(date '+%F %T')" >> $GITHUB_ENV
 
       - name: Commit filters
         uses: EndBug/add-and-commit@v9.1.4
