@@ -11,8 +11,6 @@ const accountConfigs = getAccountConfigs();
 
     // Create a Wirefilter expression to match DNS queries against all the lists
     const wirefilterDNSExpression = lists.reduce((previous, current) => {
-      if (!current.name.startsWith("CGPS List")) return previous;
-
       return `${previous} any(dns.domains[*] in \$${current.id}) or `;
     }, "");
 
@@ -24,8 +22,6 @@ const accountConfigs = getAccountConfigs();
     // This only works for users who proxy their traffic through Cloudflare.
     if (BLOCK_BASED_ON_SNI) {
       const wirefilterSNIExpression = lists.reduce((previous, current) => {
-        if (!current.name.startsWith("CGPS List")) return previous;
-
         return `${previous} any(net.sni.domains[*] in \$${current.id}) or `;
       }, "");
 
@@ -44,15 +40,14 @@ const accountConfigs = getAccountConfigs();
       console.log(`Creating rules for Account ${accountConfig.accountNumber}...`);
       
       const { result: lists } = await getZeroTrustLists(accountConfig);
-      const cgpsLists = lists.filter(list => list.name.startsWith("CGPS List"));
       
-      if (cgpsLists.length === 0) {
-        console.log(`No CGPS lists found for Account ${accountConfig.accountNumber}, skipping rule creation.`);
+      if (!lists || lists.length === 0) {
+        console.log(`No lists found for Account ${accountConfig.accountNumber}, skipping rule creation.`);
         continue;
       }
 
       // Create a Wirefilter expression to match DNS queries against all the lists for this account
-      const wirefilterDNSExpression = cgpsLists.reduce((previous, current) => {
+      const wirefilterDNSExpression = lists.reduce((previous, current) => {
         return `${previous} any(dns.domains[*] in \$${current.id}) or `;
       }, "");
 
@@ -63,7 +58,7 @@ const accountConfigs = getAccountConfigs();
       // Optionally create a rule that matches the SNI.
       // This only works for users who proxy their traffic through Cloudflare.
       if (BLOCK_BASED_ON_SNI) {
-        const wirefilterSNIExpression = cgpsLists.reduce((previous, current) => {
+        const wirefilterSNIExpression = lists.reduce((previous, current) => {
           return `${previous} any(net.sni.domains[*] in \$${current.id}) or `;
         }, "");
 

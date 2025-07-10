@@ -20,23 +20,21 @@ import { notifyWebhook } from "./lib/utils.js";
       return;
     }
 
-    const cgpsLists = lists.filter(({ name }) => name.startsWith("CGPS List"));
-
-    if (!cgpsLists.length) {
+    if (!lists.length) {
       console.warn(
-        "No lists with matching name found - this is not an issue if you haven't created any filter lists before. Exiting."
+        "No lists found - this is not an issue if you haven't created any filter lists before. Exiting."
       );
       return;
     }
 
     console.log(
-      `Got ${lists.length} lists, ${cgpsLists.length} of which are CGPS lists that will be deleted.`
+      `Got ${lists.length} lists, all will be deleted.`
     );
 
-    console.log(`Deleting ${cgpsLists.length} lists...`);
+    console.log(`Deleting ${lists.length} lists...`);
 
-    await deleteZeroTrustListsOneByOne(cgpsLists);
-    await notifyWebhook(`CF List Delete script finished running (${cgpsLists.length} lists)`);
+    await deleteZeroTrustListsOneByOne(lists);
+    await notifyWebhook(`CF List Delete script finished running (${lists.length} lists)`);
   } else {
     // Multi-account mode
     console.log(`Deleting lists across ${accountConfigs.length} accounts...`);

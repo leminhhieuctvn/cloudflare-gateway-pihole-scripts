@@ -12,22 +12,23 @@ const accountConfigs = getAccountConfigs();
   if (accountConfigs.length === 1) {
     // Single account mode (backward compatibility)
     const { result: rules } = await getZeroTrustRules();
-    const cgpsRules = rules.filter(({ name }) => name.startsWith("CGPS Filter Lists"));
 
-    if (!cgpsRules.length) {
+    if (!rules || !rules.length) {
       console.warn(
-        "No rule(s) with matching name found - this is not an issue if you haven't run the create script yet. Exiting."
+        "No rule(s) found - this is not an issue if you haven't run the create script yet. Exiting."
       );
       return;
     }
 
-    for (const cgpsRule of cgpsRules) {
-      console.log(`Deleting rule ${cgpsRule.name}...`);
-      await deleteZeroTrustRule(cgpsRule.id);
+    console.log(`Found ${rules.length} rules, deleting all...`);
+    
+    for (const rule of rules) {
+      console.log(`Deleting rule ${rule.name}...`);
+      await deleteZeroTrustRule(rule.id);
     }
     
     // Send a notification to the webhook
-    await notifyWebhook("CF Gateway Rule Delete script finished running");
+    await notifyWebhook(`CF Gateway Rule Delete script finished running (${rules.length} rules)`);
   } else {
     // Multi-account mode
     console.log(`Deleting rules across ${accountConfigs.length} accounts...`);
