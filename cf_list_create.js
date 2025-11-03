@@ -1,4 +1,5 @@
 import { existsSync } from "node:fs";
+import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 import { createZeroTrustListsOneByOne } from "./lib/api.js";
@@ -148,6 +149,13 @@ console.log("\n\n");
   );
 
   await createZeroTrustListsOneByOne(domains);
+  
+  // Write processed domains to file
+  const processedDomainsFile = "processed_domains.txt";
+  const domainsContent = domains.join("\n");
+  await writeFile(processedDomainsFile, domainsContent, "utf-8");
+  console.log(`Processed domains written to ${processedDomainsFile}`);
+  
   await notifyWebhook(
     `CF List Create script finished running (${domains.length} domains, ${numberOfLists} lists)`
   );

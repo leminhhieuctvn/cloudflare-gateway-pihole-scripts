@@ -63,12 +63,12 @@ jobs:
       - name: Generate date and time
         run: echo "DATE=$(date '+%F %T')" >> $GITHUB_ENV
 
-      - name: Commit filters
+      - name: Commit processed domains list
         uses: EndBug/add-and-commit@v9.1.4
         with:
-          add: ${{ env.HOSTS_FILE_PATH }}
+          add: processed_domains.txt
           default_author: github_actor
-          message: 'Cập nhật file hosts: ${{ env.DATE }}'
+          message: 'Update processed domains list: ${{ env.DATE }}'
           push: true
 
       - name: Send ping request
